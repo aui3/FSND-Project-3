@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+
+	</head>
+<body>
+<h1>Bookmarks in Category {{category_id}}</h1>
+<!--MESSAGE FLASHING EXAMPLE -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+
+<ul>
+{% for message in messages %}
+  <li><strong>{{message}}</strong></li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<br>
+<br>
+
+<div>
+	<strong><a href="{{url_for('showCategories')}}">View all Categories</a></strong><br/><br/>
+<div>
+	<strong><a href="{{url_for('newResource', category_id=category_id)}}">Add new Resource</a></strong>
+	<br/>
+	<br/>
+	<br/>
+</div>
+<div>
+{% for r in resources_list %}
+	<a href="{{r.url}}" target="_blank">{{r.name}}</a> &nbsp; &nbsp;
+
+	<img src="{{r.screenshot}}" width="100px;" height="200px;"> <br/>
+	
+	<a href="{{url_for('editResource', category_id=category_id, resource_id = r.id) }}"> Edit </a> &nbsp; &nbsp;
+	
+	<a href="{{url_for('deleteResource', category_id=category_id, resource_id = r.id) }}"> Delete </a>
+	
+	
+	<br>
+	<b> Notes:&nbsp;&nbsp;</b>{{r.notes}} &nbsp;&nbsp;
+
+	<a href="{{url_for('editNotes', category_id=category_id, resource_id = r.id) }}"> Edit </a> &nbsp; &nbsp;
+	
+	
+	<hr>
+{% endfor %}
+</div>
+
+
+</body>

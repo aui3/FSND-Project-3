@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+
+	</head>
+<body>
+
+<h1>Your bookmark categories</h1>
+<!--MESSAGE FLASHING EXAMPLE -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+
+<ul>
+{% for message in messages %}
+  <li><strong>{{message}}</strong></li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<br>
+<br>
+<div  class="new-category" >
+
+	<a href="{{url_for('newCategory')}}">Add new Category</a>
+	<br>
+	<br>
+
+</div>
+
+
+<div class="categories">
+
+	{% for c in category_list %}
+		<a href="{{url_for('showResources', category_id = c.id) }}" > {{ c.name}} </a> &nbsp; &nbsp;
+		<a href="{{url_for('editCategory', category_id = c.id) }}"> Edit </a> &nbsp; &nbsp;
+		<a href="{{url_for('deleteCategory', category_id = c.id) }}"> Delete </a>
+		<br>
+		{{c.description}}
+		<br>
+		<br>
+		<hr>
+	{% endfor %}
+
+</div>
+
+</body>

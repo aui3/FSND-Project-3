@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+
+	</head>
+<body>
+
+
+<h1>Edit Your Bookmark Resource</h1>
+
+<form action="{{url_for('editResource', resource_id=resource_id, category_id=category_id)}}" method='POST'>
+
+<p> URL </p> <input type='text' size='150' name="url" value='{{resource.url}}'>
+
+<p> Name </p> <input type='text' size='150' name="name" value='{{resource.name}}'>
+
+<p> Notes </p> <input type='text' size='150' name="notes" value='{{resource.notes}}'>
+
+<input type='submit' value="Edit" >
+</form>
+
+<p>Changed Your mind: </p> <a href="{{url_for('showResources', category_id=category_id)}}">Go Back!</a>
+
+</body>

@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+
+	</head>
+<body>
+
+
+<h1>Add a New Bookmark Resource</h1>
+
+
+
+<form action="{{url_for('newResource', category_id=category_id)}}" method='POST'>
+	<p> URL </p>
+	<input type='text' size= '100' name="url">
+
+	<input type='submit' value="Add Bookmark">
+</form>
+
+</body>

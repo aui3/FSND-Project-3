@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+
+	</head>
+<body>
+
+<h1> Edit Notes </h1>
+
+<form action="{{url_for('editNotes', category_id=category_id, resource_id=resource_id,resource=resource)}}" method= 'POST' >
+
+<p>Name</p>
+<input type='text' size='150' name='notes' value= '{{resource.notes}}'>
+
+
+<input type='submit' value='Edit'>
+</form>
+
+
+</body>
