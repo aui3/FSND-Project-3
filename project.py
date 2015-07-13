@@ -6,7 +6,7 @@ from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, BookmarkCategory, Resource, User
 
-from flask import session as login_session
+from flask import session as login_session #works like a dictionary and we can  store values in it for the longevity of a user's session with the server
 import random
 import string
 import db_helper
@@ -16,16 +16,18 @@ from oauth2client.client import FlowExchangeError
 import httplib2
 import json
 from flask import make_response
-import requests
+import requests #similar to urlib2
+
+CLIENT_ID = json.loads(open('client_secrets.json','r').read())['web']['client_id']
 
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
-cloudinary.config( 
-  cloud_name = "aui3", 
-  api_key = "227915768443584", 
-  api_secret = "FyXF-xhkTL9gouMr7hWW2ScmmWM" 
+cloudinary.config(
+  cloud_name = "aui3",
+  api_key = "227915768443584",
+  api_secret = "FyXF-xhkTL9gouMr7hWW2ScmmWM"
 )
 
 app = Flask(__name__)
@@ -37,16 +39,155 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-##########
+###################
 # Helper function
-##############
+###################
 def delete_bookmarks_in_category(category_id):
 	print "here"
 	bookmarks_list_del = session.query(Resource).filter_by(category_id=category_id)
-	
+
 	for b in bookmarks_list_del:
 		session.delete(b)
 		session.commit()
+
+
+@app.route('/login')
+def showLogin():
+    #32 characters long and a mix of upper and lower case letters.
+    # a (cross-site request forgery) forger will have to guess this key if we wants to make requests on the user's behalf.
+    #check to make sure the user and login_session have the same state value when the user authenticates
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+                    for x in xrange(32))
+    login_session['state'] = state
+    print "The current session state is %s" % login_session['state']
+    return render_template('login.html', STATE=state)
+
+#google connect
+@app.route('/gconnect', methods=['POST'])
+def gconnect():
+    #check if the token that the client sends to the server request.args.get('state') is the same as the token that the server sent the client login_session['state']
+    #ensures that the client is making the request and not a malicious script
+
+    if request.args.get('state')!= login_session['state']:
+        response= make_response(json.dumps('Invalid state parameter'),401)#??
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    code = request.data #collect the one time code that the client sends (via the ajax call). this is the code that google sends on authoirzation..
+
+    try:
+        # Upgrade the authorization code into a credentials object
+        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+
+        oauth_flow.redirect_uri = 'postmessage'
+
+        credentials = oauth_flow.step2_exchange(code)
+
+    except FlowExchangeError:
+        print "here"
+        response = make_response(
+            json.dumps('Failed to upgrade the authorization code.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        print response
+        return response
+
+    # Check that the access token is valid.
+    access_token = credentials.access_token
+    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
+           % access_token)
+    h = httplib2.Http()
+    result = json.loads(h.request(url, 'GET')[1])
+    # If there was an error in the access token info, abort.
+    if result.get('error') is not None:
+        response = make_response(json.dumps(result.get('error')), 500)
+        response.headers['Content-Type'] = 'application/json'
+
+    # Verify that the access token is used for the intended user.
+    gplus_id = credentials.id_token['sub']
+    print  "gplus_id"
+    if result['user_id'] != gplus_id:
+        response = make_response(
+            json.dumps("Token's user ID doesn't match given user ID."), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Verify that the access token is valid for this app.
+    if result['issued_to'] != CLIENT_ID:
+        response = make_response(
+            json.dumps("Token's client ID does not match app's."), 401)
+        print "Token's client ID does not match app's."
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    stored_credentials = login_session.get('credentials')
+    stored_gplus_id = login_session.get('gplus_id')
+    print login_session;
+    if stored_credentials is not None and gplus_id == stored_gplus_id:
+        response = make_response(json.dumps('Current user is already connected.'),
+                                 200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Store the access token in the session for later use.
+    login_session['credentials'] = credentials
+    login_session['gplus_id'] = gplus_id
+
+    # Get user info
+    userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+    params = {'access_token': credentials.access_token, 'alt': 'json'}
+    answer = requests.get(userinfo_url, params=params)
+
+    data = answer.json()
+
+    login_session['username'] = data['name']
+    login_session['picture'] = data['picture']
+    login_session['email'] = data['email']
+
+    # See if a user exists, if it doesn't make a new one
+    user_id = getUserID(login_session['email'])
+    if not user_id:
+      #user does not exist, create user
+      user_id =  createUser(login_session)
+    login_session['user_id'] = user_id
+
+
+
+
+    output = ''
+    output += '<h1>Welcome, '
+    output += login_session['username']
+    output += '!</h1>'
+    output += '<img src="'
+    output += login_session['picture']
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    flash("you are now logged in as %s" % login_session['username'])
+    print "done!"
+
+    return output
+# User Helper Functions
+
+
+def createUser(login_session):
+    newUser = User(name=login_session['username'], email=login_session[
+                   'email'], picture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    return user.id
+
+
+def getUserInfo(user_id):
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
+
+def getUserID(email):
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
+
 
 #Show all bookmark categories
 @app.route('/')
@@ -60,22 +201,22 @@ def showCategories():
 @app.route('/bookmark_categories/new/', methods = ['GET', 'POST'])
 def newCategory():
 	if request.method == 'POST':
-		newCategory = BookmarkCategory (name= request.form['name'], description=request.form['description']) 
+		newCategory = BookmarkCategory (name= request.form['name'], description=request.form['description'])
 		session.add(newCategory)
 		session.commit()
 		flash("New Category Added")
 		return redirect(url_for('showCategories'))
 	else :
 		return render_template("new_category.html")
-	
+
 
 
 #Edit a bookmark category
 @app.route('/bookmark_categories/<int:category_id>/edit/', methods=['GET','POST'])
 def editCategory(category_id):
-	
+
 	editedCategory = session.query(BookmarkCategory).filter_by(id=category_id).one()
-	
+
 	if request.method == 'POST':
 		if request.form['name']:
 			editedCategory.name = request.form['name']
@@ -83,19 +224,19 @@ def editCategory(category_id):
 			editedCategory.description = request.form['description']
 		session.add(editedCategory)
 		session.commit()
-		flash("Category Edited")	
-		return redirect(url_for('showCategories'))	
+		flash("Category Edited")
+		return redirect(url_for('showCategories'))
 
 	else :
-		return render_template("edit_category.html", category_id = category_id, category=editedCategory)	
+		return render_template("edit_category.html", category_id = category_id, category=editedCategory)
 
 
 #delete a bookmark category
 @app.route('/bookmark_categories/<int:category_id>/delete/', methods= ['GET', 'POST'])
 def deleteCategory(category_id):
-	
+
 	toBeDeletedCategory = session.query(BookmarkCategory).filter_by(id=category_id).one()
-	
+
 	if request.method == 'POST':
 		delete_bookmarks_in_category(category_id)
 		session.delete(toBeDeletedCategory)
@@ -104,7 +245,7 @@ def deleteCategory(category_id):
 		return redirect(url_for('showCategories'))
 	else :
 		return render_template('delete_category.html', category=toBeDeletedCategory)
-		
+
 
 
 # Show all bookmarks in a category
@@ -143,29 +284,29 @@ def newResource(category_id):
 def editResource(category_id,resource_id):
 	toBeEditedResource = session.query(Resource).filter_by(id=resource_id).one()
 	if request.method == 'POST':
-		
+
 		if request.form ['name']:
 			toBeEditedResource.name = request.form ['name']
-		
+
 		if request.form ['url']:
 			toBeEditedResource.url = request.form[ 'url']
-		
+
 		if request.form ['notes']:
 			toBeEditedResource.notes = request.form ['notes']
-		
+
 		session.add(toBeEditedResource)
 		session.commit()
 		flash("Bookmark Edited")
-		
+
 		return redirect(url_for('showResources',category_id=category_id))
-	else :	
+	else :
 		return render_template("edit_resource.html", category_id=category_id, resource_id=resource_id, resource=toBeEditedResource)
 
 
 #Delete a bookmark resource.
 @app.route('/bookmark_categories/<int:category_id>/resources/<int:resource_id>/delete/', methods=['GET','POST'])
 def deleteResource(category_id,resource_id):
-	
+
 	toBeDeletedResource = session.query(Resource).filter_by(id=resource_id).one()
 
 	if request.method== 'POST':
@@ -175,7 +316,7 @@ def deleteResource(category_id,resource_id):
 		return redirect(url_for('showResources',category_id=category_id))
 	else :
 		return render_template('delete_resource.html', category_id=category_id, resource_id=resource_id, resource=toBeDeletedResource)
-	
+
 
 #Edit  a bookmark note.
 @app.route('/bookmark_categories/<int:category_id>/resources/<int:resource_id>/edit_notes/', methods=['GET', 'POST'])
