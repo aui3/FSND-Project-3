@@ -1,9 +1,5 @@
-<!DOCTYPE HTML>
-<html>
-	<head>
-
-	</head>
-<body>
+{% extends "base.html" %}
+{% block content %}
 
 
 <h1>Edit Your Bookmark Resource</h1>
@@ -21,4 +17,4 @@
 
 <p>Changed Your mind: </p> <a href="{{url_for('showResources', category_id=category_id)}}">Go Back!</a>
 
-</body>
+{% endblock %}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<link href='http://fonts.googleapis.com/css?family=Roboto:400,300,700' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
+		<!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
+		</script>
+
+		<script src="https://apis.google.com/js/client:platform.js?onload=start" async defer>
+		</script>
+	</head>
+	
+	<body>
+		<main class="container-fluid"> 
+			
+		<header class="row">
+			<!-- Login Log Out-->
+			<div class="col-md-9 app-name">
+					Bookmarks App
+			</div>
+			<div class="col-md-3">
+				
+				{% if user_id %} 
+					
+					<h2>Hi, {{login_session['username']}}</h2>
+					<a href="{{url_for('gdisconnect')}}"> Logout </a>
+
+				{% else %}
+					
+					<a href="{{url_for('showLogin')}}"> Login </a>
+				
+				{% endif %}
+			</div>
+		</header>
+
+		<section  class="row">
+			{% block content %}
+			{% endblock %}
+		</section>
+		
+		
+		</main>
+	</body>
+</html>

@@ -5,8 +5,8 @@
 	</head>
 <body>
 !-->
-{% extends "bookmark_categories.html" %}
-{% block contentres %}
+{% extends "base.html" %}
+{% block content %}
 
 <!-- Login Log Out
 <div id="login"> <a href="{{url_for('showLogin')}}"> Login </a></div>
@@ -25,12 +25,49 @@ Hi, {{login_session['username']}}
 {% endif %}
 -->
 
+<h1>Bookmarks in Category {{category_id}}</h1>
+<!--MESSAGE FLASHING EXAMPLE -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
 
-	<div class="resources">
+<ul>
+{% for message in messages %}
+  <li><strong>{{message}}</strong></li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<br>
+<br>
 
-	<h2><a href="{{url_for('newResource', category_id=category_id)}}">Add new Resource</a></strong></h2>
+<div class="row">
+		<strong><a href="{{url_for('showCategories')}}">View all Categories</a></strong><br/><br/>
+	
+	<div>
+		<strong><a href="{{url_for('newResource', category_id=category_id)}}">Add new Resource</a></strong>
+		<br/>
+		<br/>
+		<br/>
+	</div>
 
+	<!--All categories on the left -->
+	<div class="categories col-xs-12" >
 
+	{% for c in category_list %}
+		<a href="{{url_for('showResources', category_id = c.id) }}" > {{ c.name}} </a> &nbsp; &nbsp;
+		{% if c.user_id == user_id %}
+		<a href="{{url_for('editCategory', category_id = c.id) }}"> Edit </a> &nbsp; &nbsp;
+		<a href="{{url_for('deleteCategory', category_id = c.id) }}"> Delete </a>
+		{% endif %}
+		<br>
+		{{c.description}}
+		<br>
+		<br>
+		<hr>
+	{% endfor %}
+
+	</div>
+	<div class="resources col-xs-12 col-sm-8 col-md-9" >
 	{% for r in resources_list %}
 		<a href="{{r.url}}" target="_blank">{{r.name}}</a> &nbsp; &nbsp;
 
@@ -56,4 +93,5 @@ Hi, {{login_session['username']}}
 	{% endblock %}
 	</div>
 
-
+</div>
+</body>

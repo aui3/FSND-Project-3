@@ -43,12 +43,12 @@ session = DBSession()
 # Helper function
 ###################
 def delete_bookmarks_in_category(category_id):
-	print "here"
-	bookmarks_list_del = session.query(Resource).filter_by(category_id=category_id)
+    print "here"
+    bookmarks_list_del = session.query(Resource).filter_by(category_id=category_id)
 
-	for b in bookmarks_list_del:
-		session.delete(b)
-		session.commit()
+    for b in bookmarks_list_del:
+        session.delete(b)
+        session.commit()
 
 
 @app.route('/login')
@@ -67,6 +67,7 @@ def showLogin():
 def gconnect():
     #check if the token that the client sends to the server request.args.get('state') is the same as the token that the server sent the client login_session['state']
     #ensures that the client is making the request and not a malicious script
+   
 
     if request.args.get('state')!= login_session['state']:
         response= make_response(json.dumps('Invalid state parameter'),401)#??
@@ -93,6 +94,8 @@ def gconnect():
 
     # Check that the access token is valid.
     access_token = credentials.access_token
+    print "in connect"
+    print access_token
     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
            % access_token)
     h = httplib2.Http()
@@ -123,6 +126,7 @@ def gconnect():
     stored_gplus_id = login_session.get('gplus_id')
     print login_session;
     if stored_credentials is not None and gplus_id == stored_gplus_id:
+        print access_token
         response = make_response(json.dumps('Current user is already connected.'),
                                  200)
         response.headers['Content-Type'] = 'application/json'
@@ -164,8 +168,8 @@ def gconnect():
     print "done!"
 
     return output
-# User Helper Functions
 
+# User Helper Functions
 
 def createUser(login_session):
     newUser = User(name=login_session['username'], email=login_session[
@@ -188,26 +192,83 @@ def getUserID(email):
     except:
         return None
 
+# DISCONNECT - Revoke a current user's token and reset their login_session
+@app.route('/gdisconnect')
+def gdisconnect():
+        # Only disconnect a connected user.
+    credentials = login_session.get('credentials')
+    if credentials is None:
+        response = make_response(
+            json.dumps('Current user not connected.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    access_token = credentials.access_token
+    #access_token="ya29.rwFMcf5hxMKBkb-d_WtBZZh2bPIfJHBb8Y4AB_HY26UrDzZ44zQprIecagyLCNIRE1nj"
+    #access_token="ya29.uAF202rDtohiyC2uwIe9laQyoh_lwz7MDDLUqkj3QhgXgfrG1C7ngSuh1lF_sqHb-Tlp"
+    print "in discoinnect"
+    print access_token
+
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[0]
+   
+
+    if result['status'] == '200':
+        # Reset the user's sesson.
+        del login_session['credentials']
+        del login_session['gplus_id']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+        del login_session['user_id']
+
+        response = make_response(json.dumps('Successfully disconnected.'), 200)
+        response.headers['Content-Type'] = 'application/json'
+        flash("Successfully disconnected")
+        return redirect(url_for('showCategories'))
+    else:
+        # For whatever reason, the given token was invalid.
+        response = make_response(
+            json.dumps('Failed to revoke token for given user.', 400))
+        response.headers['Content-Type'] = 'application/json'
+        
+        return response
 
 #Show all bookmark categories
 @app.route('/')
 @app.route('/bookmark_categories/')
 def showCategories():
-	category_list = session.query(BookmarkCategory)
-	return render_template("bookmark_categories.html", category_list=category_list)
+    category_list = session.query(BookmarkCategory)
+    #print "check"
+   # print type(login_session)
+    #print hasattr(login_session,'user_id')
+    #print login_session['user_id']
+    if 'user_id' in login_session:
+        print "user id %s", login_session['user_id']
+        return render_template("bookmark_categories.html", category_list=category_list, user_id=login_session['user_id'], login_session=login_session)
+    else:
+        print "no user id"
+        return render_template("bookmark_categories.html", category_list=category_list, user_id= "" )
+            
 
 
 # Add a new bookmarkcategory
 @app.route('/bookmark_categories/new/', methods = ['GET', 'POST'])
 def newCategory():
-	if request.method == 'POST':
-		newCategory = BookmarkCategory (name= request.form['name'], description=request.form['description'])
-		session.add(newCategory)
-		session.commit()
-		flash("New Category Added")
-		return redirect(url_for('showCategories'))
-	else :
-		return render_template("new_category.html")
+    print "here here"
+    if 'username'  not in login_session:
+        print "here heress"
+        return redirect('/login')
+    if request.method == 'POST':
+        print "here3"
+        newCategory = BookmarkCategory (name= request.form['name'], description=request.form['description'], user_id=login_session['user_id'])
+        session.add(newCategory)
+        session.commit()
+        flash("New Category Added")
+        return redirect(url_for('showCategories'))
+    else:
+        print "here1"
+        return render_template("new_category.html")
 
 
 
@@ -215,36 +276,41 @@ def newCategory():
 @app.route('/bookmark_categories/<int:category_id>/edit/', methods=['GET','POST'])
 def editCategory(category_id):
 
-	editedCategory = session.query(BookmarkCategory).filter_by(id=category_id).one()
+    if 'username'  not in login_session:
+        return redirect('/login')
 
-	if request.method == 'POST':
-		if request.form['name']:
-			editedCategory.name = request.form['name']
-		if request.form['description']:
-			editedCategory.description = request.form['description']
-		session.add(editedCategory)
-		session.commit()
-		flash("Category Edited")
-		return redirect(url_for('showCategories'))
+    editedCategory = session.query(BookmarkCategory).filter_by(id=category_id).one()
 
-	else :
-		return render_template("edit_category.html", category_id = category_id, category=editedCategory)
+    if request.method == 'POST':
+        if request.form['name']:
+            editedCategory.name = request.form['name']
+        if request.form['description']:
+            editedCategory.description = request.form['description']
+        session.add(editedCategory)
+        session.commit()
+        flash("Category Edited")
+        return redirect(url_for('showCategories'))
+
+    else :
+        return render_template("edit_category.html", category_id = category_id, category=editedCategory)
 
 
 #delete a bookmark category
 @app.route('/bookmark_categories/<int:category_id>/delete/', methods= ['GET', 'POST'])
 def deleteCategory(category_id):
+    if 'username'  not in login_session:
+        return redirect('/login')
 
-	toBeDeletedCategory = session.query(BookmarkCategory).filter_by(id=category_id).one()
+    toBeDeletedCategory = session.query(BookmarkCategory).filter_by(id=category_id).one()
 
-	if request.method == 'POST':
-		delete_bookmarks_in_category(category_id)
-		session.delete(toBeDeletedCategory)
-		session.commit()
-		flash("Category Deleted")
-		return redirect(url_for('showCategories'))
-	else :
-		return render_template('delete_category.html', category=toBeDeletedCategory)
+    if request.method == 'POST':
+        delete_bookmarks_in_category(category_id)
+        session.delete(toBeDeletedCategory)
+        session.commit()
+        flash("Category Deleted")
+        return redirect(url_for('showCategories'))
+    else :
+        return render_template('delete_category.html', category=toBeDeletedCategory)
 
 
 
@@ -252,84 +318,100 @@ def deleteCategory(category_id):
 @app.route('/bookmark_categories/<int:category_id>/')
 @app.route('/bookmark_categories/<int:category_id>/resources/')
 def showResources(category_id):
-	resources_list = session.query(Resource).filter_by(category_id=category_id)
-	return render_template ("bookmark_resources.html", resources_list=resources_list, category_id=category_id)
+    resources_list = session.query(Resource).filter_by(category_id=category_id)
+    category_list = session.query(BookmarkCategory)
+    if 'user_id' in login_session:
+        print "has user_id"
+        return render_template ("bookmark_resources.html", resources_list=resources_list, category_id=category_id, user_id=login_session['user_id'], login_session=login_session, category_list=category_list)
+    else:
+        print "has no user_id"
+        return render_template ("bookmark_resources.html", resources_list=resources_list, category_id=category_id, user_id="",category_list=category_list)    
 
 
 # Add a new bookmark resource
 @app.route('/bookmark_categories/<int:category_id>/resources/new/', methods=['GET', 'POST'])
 def newResource(category_id):
-	name=''
-	if request.method == 'POST':
-		if request.form["url"]:
-			soup = BeautifulSoup(urllib2.urlopen(request.form["url"]))
-			title = soup.find('title')
-			#if the soup module can not extract a title, use the url as the name
-			if not title:
-				name= request.form["url"]
-			else:
-				name= soup.title.string
-			image= cloudinary.CloudinaryImage(request.form['url'], type = "url2png").build_url(crop = "fill", width = 150, height = 200, gravity = "north", sign_url = True)
-			bookmark = Resource (url=request.form["url"], name=name, category_id=category_id, screenshot=image)
-			session.add(bookmark)
-			session.commit()
-			flash("New Bookmark Resource Added")
-		return redirect(url_for('showResources', category_id=category_id))
-	else :
-		return render_template('new_resource.html', category_id=category_id)
+    if 'username'  not in login_session:
+        print "here "
+        return redirect('/login')
+    name=''
+    if request.method == 'POST':
+        if request.form["url"]:
+            soup = BeautifulSoup(urllib2.urlopen(request.form["url"]))
+            title = soup.find('title')
+            #if the soup module can not extract a title, use the url as the name
+            if not title:
+                name= request.form["url"]
+            else:
+                name= soup.title.string
+            image= cloudinary.CloudinaryImage(request.form['url'], type = "url2png").build_url(crop = "fill", width = 150, height = 200, gravity = "north", sign_url = True)
+            bookmark = Resource (url=request.form["url"], name=name, category_id=category_id, screenshot=image ,user_id= login_session['user_id'])
+            session.add(bookmark)
+            session.commit()
+            flash("New Bookmark Resource Added")
+        return redirect(url_for('showResources', category_id=category_id))
+    else :
+        print "here 1"
+        return render_template('new_resource.html', category_id=category_id)
 
 
 #Edit a bookmark resource
 @app.route('/bookmark_categories/<int:category_id>/resources/<int:resource_id>/edit/', methods=['GET','POST'])
 def editResource(category_id,resource_id):
-	toBeEditedResource = session.query(Resource).filter_by(id=resource_id).one()
-	if request.method == 'POST':
+    if 'username'  not in login_session:
+        return redirect('/login')
+    toBeEditedResource = session.query(Resource).filter_by(id=resource_id).one()
+    if request.method == 'POST':
 
-		if request.form ['name']:
-			toBeEditedResource.name = request.form ['name']
+        if request.form ['name']:
+            toBeEditedResource.name = request.form ['name']
 
-		if request.form ['url']:
-			toBeEditedResource.url = request.form[ 'url']
+        if request.form ['url']:
+            toBeEditedResource.url = request.form[ 'url']
 
-		if request.form ['notes']:
-			toBeEditedResource.notes = request.form ['notes']
+        if request.form ['notes']:
+            toBeEditedResource.notes = request.form ['notes']
 
-		session.add(toBeEditedResource)
-		session.commit()
-		flash("Bookmark Edited")
+        session.add(toBeEditedResource)
+        session.commit()
+        flash("Bookmark Edited")
 
-		return redirect(url_for('showResources',category_id=category_id))
-	else :
-		return render_template("edit_resource.html", category_id=category_id, resource_id=resource_id, resource=toBeEditedResource)
+        return redirect(url_for('showResources',category_id=category_id))
+    else :
+        return render_template("edit_resource.html", category_id=category_id, resource_id=resource_id, resource=toBeEditedResource)
 
 
 #Delete a bookmark resource.
 @app.route('/bookmark_categories/<int:category_id>/resources/<int:resource_id>/delete/', methods=['GET','POST'])
 def deleteResource(category_id,resource_id):
+    if 'username'  not in login_session:
+        return redirect('/login')
 
-	toBeDeletedResource = session.query(Resource).filter_by(id=resource_id).one()
+    toBeDeletedResource = session.query(Resource).filter_by(id=resource_id).one()
 
-	if request.method== 'POST':
-		session.delete(toBeDeletedResource)
-		session.commit()
-		flash("Bookmark deleted")
-		return redirect(url_for('showResources',category_id=category_id))
-	else :
-		return render_template('delete_resource.html', category_id=category_id, resource_id=resource_id, resource=toBeDeletedResource)
+    if request.method== 'POST':
+        session.delete(toBeDeletedResource)
+        session.commit()
+        flash("Bookmark deleted")
+        return redirect(url_for('showResources',category_id=category_id))
+    else :
+        return render_template('delete_resource.html', category_id=category_id, resource_id=resource_id, resource=toBeDeletedResource)
 
 
 #Edit  a bookmark note.
 @app.route('/bookmark_categories/<int:category_id>/resources/<int:resource_id>/edit_notes/', methods=['GET', 'POST'])
 def editNotes(category_id,resource_id):
-	resource = session.query(Resource).filter_by(id=resource_id).one()
-	if request.method == 'POST':
-		resource.notes = request.form['notes']
-		session.add(resource)
-		session.commit()
-		flash("Note Edited")
-		return redirect(url_for('showResources',category_id=category_id))
-	else:
-		return render_template("edit_notes.html", category_id=category_id,resource_id=resource_id, resource=resource)
+    if 'username'  not in login_session:
+        return redirect('/login')
+    resource = session.query(Resource).filter_by(id=resource_id).one()
+    if request.method == 'POST':
+        resource.notes = request.form['notes']
+        session.add(resource)
+        session.commit()
+        flash("Note Edited")
+        return redirect(url_for('showResources',category_id=category_id))
+    else:
+        return render_template("edit_notes.html", category_id=category_id,resource_id=resource_id, resource=resource)
 
 
 ##################
@@ -340,23 +422,23 @@ def editNotes(category_id,resource_id):
 @app.route('/bookmark_categories/JSON')
 @app.route('/JSON')
 def categoriesJSON():
-	category_list = session.query(BookmarkCategory)
-	return jsonify(Categories= [i.serialize for i in category_list])
+    category_list = session.query(BookmarkCategory)
+    return jsonify(Categories= [i.serialize for i in category_list])
 
 #JSON endpoint for all bookmarks in a category
 @app.route('/bookmark_categories/<int:category_id>/resources/JSON')
 @app.route('/bookmark_categories/<int:category_id>/JSON')
 def bookmarksInCategory(category_id):
-	bookmarks_list = session.query(Resource).filter_by(category_id=category_id)
-	return jsonify(BookmarKs=[i.serialize for i in bookmarks_list])
+    bookmarks_list = session.query(Resource).filter_by(category_id=category_id)
+    return jsonify(BookmarKs=[i.serialize for i in bookmarks_list])
 
 #JSON endpoint for one bookmarkresource
 @app.route('/bookmark_categories/<int:category_id>/resources/<int:resource_id>/JSON')
 def bookmarkJSON(category_id,resource_id):
-	bookmark = session.query(Resource).filter_by(id=resource_id).one()
-	return jsonify(Bookmark= bookmark.serialize)
+    bookmark = session.query(Resource).filter_by(id=resource_id).one()
+    return jsonify(Bookmark= bookmark.serialize)
 
 if __name__ == '__main__':
-	app.secret_key = 'super_secret_key'
-	app.debug = True
-	app.run(host='0.0.0.0', port=5000)
+    app.secret_key = 'super_secret_key'
+    app.debug = True
+    app.run(host='0.0.0.0', port=5000)

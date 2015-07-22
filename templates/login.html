@@ -1,16 +1,5 @@
-<!DOCTYPE HTML>
-<html>
-	<head>
-    <!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
-  	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
-  	</script>
-
-  	<script src="https://apis.google.com/js/client:platform.js?onload=start" async defer>
-  	</script>
-  <!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
-
-	</head>
-<body>
+{% extends "base.html" %}
+{% block content %}
   <!-- GOOGLE PLUS SIGN IN-->
   <div id="signinButton">
   	<span class="g-signin"
@@ -119,4 +108,4 @@
 
 
 
-</body>
+{% endblock %}

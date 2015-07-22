@@ -1,46 +1,88 @@
-<!DOCTYPE HTML>
+<!--<!DOCTYPE HTML>
 <html>
 	<head>
 
 	</head>
 <body>
+!-->
+{% extends "base.html" %}
+{% block content %}
 
-<h1>Your bookmark categories</h1>
-<!--MESSAGE FLASHING EXAMPLE -->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
+<!-- Login Log Out
+<div id="login"> <a href="{{url_for('showLogin')}}"> Login </a></div>
 
-<ul>
-{% for message in messages %}
-  <li><strong>{{message}}</strong></li>
-  {% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
-<br>
-<br>
-<div  class="new-category" >
+<div id="logout" style="display:none;"> <a href="{{url_for('gdisconnect')}}"> Logout </a></div>
 
-	<a href="{{url_for('newCategory')}}">Add new Category</a>
-	<br>
-	<br>
-
+{% if user_id %}
+<div class="userinfo"> 
+Hi, {{login_session['username']}}
 </div>
+<script type="text/javascript">
+	document.getElementById('login').style.display="none";
+	document.getElementById('logout').style.display="block";
+</script>
 
+{% endif %}
+-->
+<!-- CATEGORY AREA-->
+<section class="col-md-5 category-area">
+	<h1>Your bookmark categories</h1>
+	<div  class="new-category" >
 
-<div class="categories">
+		<a href="{{url_for('newCategory')}}">Add new Category</a>
+	</div>
+	<div class="categories">
 
 	{% for c in category_list %}
 		<a href="{{url_for('showResources', category_id = c.id) }}" > {{ c.name}} </a> &nbsp; &nbsp;
+		{% if c.user_id == user_id %}
 		<a href="{{url_for('editCategory', category_id = c.id) }}"> Edit </a> &nbsp; &nbsp;
 		<a href="{{url_for('deleteCategory', category_id = c.id) }}"> Delete </a>
+		{% endif %}
 		<br>
 		{{c.description}}
-		<br>
-		<br>
+		
 		<hr>
 	{% endfor %}
 
-</div>
+		</div>
 
-</body>
+
+</section>
+
+<!-- Flash Message and latest -->
+<section class="col-md-7">
+	<div class="flass-message">
+		<!--MESSAGE FLASHING EXAMPLE -->
+		{% with messages = get_flashed_messages() %}
+		{% if messages %}
+
+		<ul>
+		{% for message in messages %}
+		  <li><strong>{{message}}</strong></li>
+		  {% endfor %}
+		</ul>
+		{% endif %}
+		{% endwith %}
+	</div>
+
+	<section class="resources">
+		{% block contentres %}
+		{% endblock %}
+	</section>
+</section>
+
+
+{% endblock %}
+<!--<div>
+user id is: {{login_session}}
+
+
+</div> 
+!-->
+
+
+
+
+
+<!--</body>!-->
