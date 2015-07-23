@@ -67,28 +67,8 @@ Hi, {{login_session['username']}}
 	</div>
 
 	<section class="resources">
-	<h2> Latest Items</h2>
-		{% for r in recent_list %}
-		<a href="{{r.url}}" target="_blank">{{r.name}}</a> &nbsp; &nbsp;
-
-		<img src="{{r.screenshot}}" width="100px;" height="100px;"> <br/>
-		{% if r.user_id == user_id %}
-
-		<a href="{{url_for('editResource', category_id = r.category_id, resource_id = r.id) }}"> Edit </a> &nbsp; &nbsp;
-
-		<a href="{{url_for('deleteResource', category_id = r.category_id, resource_id = r.id) }}"> Delete </a>
-		{% endif %}
-
-		<br>
-		<b> Notes:&nbsp;&nbsp;</b>{{r.notes}} &nbsp;&nbsp;
-
-		{% if r.user_id == user_id %}
-
-		<a href="{{url_for('editNotes', category_id=r.category_id, resource_id = r.id) }}"> Edit </a> &nbsp; &nbsp;
-		{% endif %}
-
-		<hr>
-	{% endfor %}
+		{% block contentres %}
+		{% endblock %}
 	</section>
 </section>
 

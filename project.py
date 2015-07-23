@@ -60,7 +60,7 @@ def showLogin():
                     for x in xrange(32))
     login_session['state'] = state
     print "The current session state is %s" % login_session['state']
-    return render_template('login.html', STATE=state)
+    return render_template('login.html', STATE=state, login_session=login_session)
 
 #google connect
 @app.route('/gconnect', methods=['POST'])
@@ -204,7 +204,7 @@ def gdisconnect():
         return response
     access_token = credentials.access_token
     #access_token="ya29.rwFMcf5hxMKBkb-d_WtBZZh2bPIfJHBb8Y4AB_HY26UrDzZ44zQprIecagyLCNIRE1nj"
-    #access_token="ya29.uAF202rDtohiyC2uwIe9laQyoh_lwz7MDDLUqkj3QhgXgfrG1C7ngSuh1lF_sqHb-Tlp"
+    #access_token="ya29.uAGEvXxvBmYsiSGjAk5z6QX-wMLahM5m8k00xlHRBPWD9unOpWlZkol_2n50HKZE9-4W"
     print "in discoinnect"
     print access_token
 
@@ -239,16 +239,17 @@ def gdisconnect():
 @app.route('/bookmark_categories/')
 def showCategories():
     category_list = session.query(BookmarkCategory)
+    recent_list = session.query(Resource).order_by(Resource.date_time.desc()).limit(5)
     #print "check"
    # print type(login_session)
     #print hasattr(login_session,'user_id')
     #print login_session['user_id']
     if 'user_id' in login_session:
         print "user id %s", login_session['user_id']
-        return render_template("bookmark_categories.html", category_list=category_list, user_id=login_session['user_id'], login_session=login_session)
+        return render_template("bookmark_categories.html", recent_list=recent_list, category_list=category_list, user_id=login_session['user_id'], login_session=login_session)
     else:
         print "no user id"
-        return render_template("bookmark_categories.html", category_list=category_list, user_id= "" )
+        return render_template("bookmark_categories.html", recent_list=recent_list, category_list=category_list, user_id= "" )
             
 
 
@@ -268,7 +269,7 @@ def newCategory():
         return redirect(url_for('showCategories'))
     else:
         print "here1"
-        return render_template("new_category.html")
+        return render_template("new_category.html", login_session=login_session)
 
 
 
@@ -292,7 +293,7 @@ def editCategory(category_id):
         return redirect(url_for('showCategories'))
 
     else :
-        return render_template("edit_category.html", category_id = category_id, category=editedCategory)
+        return render_template("edit_category.html", category_id = category_id, category=editedCategory, login_session=login_session)
 
 
 #delete a bookmark category
@@ -310,7 +311,7 @@ def deleteCategory(category_id):
         flash("Category Deleted")
         return redirect(url_for('showCategories'))
     else :
-        return render_template('delete_category.html', category=toBeDeletedCategory)
+        return render_template('delete_category.html', category=toBeDeletedCategory,login_session=login_session)
 
 
 
@@ -320,6 +321,7 @@ def deleteCategory(category_id):
 def showResources(category_id):
     resources_list = session.query(Resource).filter_by(category_id=category_id)
     category_list = session.query(BookmarkCategory)
+    
     if 'user_id' in login_session:
         print "has user_id"
         return render_template ("bookmark_resources.html", resources_list=resources_list, category_id=category_id, user_id=login_session['user_id'], login_session=login_session, category_list=category_list)
@@ -352,7 +354,7 @@ def newResource(category_id):
         return redirect(url_for('showResources', category_id=category_id))
     else :
         print "here 1"
-        return render_template('new_resource.html', category_id=category_id)
+        return render_template('new_resource.html', category_id=category_id, login_session=login_session)
 
 
 #Edit a bookmark resource
@@ -378,7 +380,7 @@ def editResource(category_id,resource_id):
 
         return redirect(url_for('showResources',category_id=category_id))
     else :
-        return render_template("edit_resource.html", category_id=category_id, resource_id=resource_id, resource=toBeEditedResource)
+        return render_template("edit_resource.html", category_id=category_id, resource_id=resource_id, resource=toBeEditedResource, login_session=login_session)
 
 
 #Delete a bookmark resource.
@@ -395,7 +397,7 @@ def deleteResource(category_id,resource_id):
         flash("Bookmark deleted")
         return redirect(url_for('showResources',category_id=category_id))
     else :
-        return render_template('delete_resource.html', category_id=category_id, resource_id=resource_id, resource=toBeDeletedResource)
+        return render_template('delete_resource.html', category_id=category_id, resource_id=resource_id, resource=toBeDeletedResource, login_session=login_session)
 
 
 #Edit  a bookmark note.
@@ -411,7 +413,7 @@ def editNotes(category_id,resource_id):
         flash("Note Edited")
         return redirect(url_for('showResources',category_id=category_id))
     else:
-        return render_template("edit_notes.html", category_id=category_id,resource_id=resource_id, resource=resource)
+        return render_template("edit_notes.html", category_id=category_id,resource_id=resource_id, resource=resource, login_session=login_session)
 
 
 ##################

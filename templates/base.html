@@ -18,11 +18,11 @@
 		<header class="row">
 			<!-- Login Log Out-->
 			<div class="col-md-9 app-name">
-					Bookmarks App
+					<a href="{{url_for('showCategories')}}">Bookmarks App</a>
 			</div>
 			<div class="col-md-3">
 				
-				{% if user_id %} 
+				{% if 'username' in login_session %} 
 					
 					<h2>Hi, {{login_session['username']}}</h2>
 					<a href="{{url_for('gdisconnect')}}"> Logout </a>
@@ -40,7 +40,7 @@
 			{% endblock %}
 		</section>
 		
-		
+
 		</main>
 	</body>
 </html>

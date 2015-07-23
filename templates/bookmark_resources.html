@@ -1,32 +1,7 @@
-<!--<!DOCTYPE HTML>
-<html>
-	<head>
-
-	</head>
-<body>
-!-->
-{% extends "bookmark_categories.html" %}
+{% extends "bookmark_categories_base.html" %}
 {% block contentres %}
 
-<!-- Login Log Out
-<div id="login"> <a href="{{url_for('showLogin')}}"> Login </a></div>
-
-<div id="logout" style="display:none;"> <a href="{{url_for('gdisconnect')}}"> Logout </a></div>
-
-{% if user_id %}
-<div class="userinfo"> 
-Hi, {{login_session['username']}}
-</div>
-<script type="text/javascript">
-	document.getElementById('login').style.display="none";
-	document.getElementById('logout').style.display="block";
-</script>
-
-{% endif %}
--->
-
-
-	<div class="resources">
+	<section class="resources">
 
 	<h2><a href="{{url_for('newResource', category_id=category_id)}}">Add new Resource</a></strong></h2>
 
@@ -54,6 +29,6 @@ Hi, {{login_session['username']}}
 	{% endfor %}
 
 	{% endblock %}
-	</div>
+	</section>
 
 
