@@ -26,37 +26,31 @@ FSND- Project 3 Bookmarks Catalog App
 3. Copy all source files from the project here. 
 
 
-
-4. Set up the data base to for the project by connecting to psql. At the command prompt type:
-
-	e) <b>psql</b> 
-
-
-
-5. To set up the database and views at the command prompt run
+4. To set up the database and views at the command prompt run
 
 	f) <b>python database_setup.py</b>
 
 
-6. Populate the database with some entries:
+5. Populate the database with some entries:
 	g) <b>python lotsofbookmarks.py</b>
 
 
-7. Install <b>cloudinary</b> [Using Cloudinary's image services to take a screen shot of the bookmark site. The image url is saved in the database while the image itself is hosted with Coudinary]
+6. Install <b>cloudinary</b> [Using Cloudinary's image services to take a screen shot of the bookmark site. The image url is saved in the database while the image itself is hosted with Coudinary]
 	h) <b>sudo pip install cloudinart</b>
 
-8. Install <b>beautifulsoup</b> [Using this python library to extract the title of a webpage that has to be added as a bookmark. The library parses through the html of a given webpage]
+7. Install <b>beautifulsoup</b> [Using this python library to extract the title of a webpage that has to be added as a bookmark. The library parses through the html of a given webpage]
 	i) <b>sudo pip install beautifulsoup</b>
 	
 
-9. Run the project
+8. Run the project
 	j) <b> python project.py</b>
 
 
-8. To view the project, open the broswer at 
+9. To view the project, open the broswer at 
 
 	g) <b>http://localhost:5000</b>
 
 
+10. Quit by pressing Ctrl + C 
 
 
