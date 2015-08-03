@@ -1,6 +1,7 @@
 * {
 	font-family: "Helvetica Neue Bold", Roboto, Helvetica, Arial, sans-serif;
 	font-weight: 700;
+	font-color: #303050;
 }
 
 
@@ -40,6 +41,8 @@
 .category-list-item {
 
 	padding: 2%;
+	border: 1px solid;
+
 }
 
 .cat-name {

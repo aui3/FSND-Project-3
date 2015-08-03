@@ -175,7 +175,7 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     access_token = credentials.access_token
-
+    #access_token = "ya29.wAHARV3mksUVHq2j20ReOHUBKMojbP4A0ZF-BqNbETItGIYuRLpjtGTJlGN9d2-yQoP-"  
     print "in discoinnect"
     print access_token
 
@@ -199,8 +199,7 @@ def gdisconnect():
         return redirect(url_for('showCategories'))
     else:
         
-        # For whatever reason, the given token was invalid.
-        
+        # For whatever reason, the given token was invalid.            
         response = make_response(
             json.dumps('Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
@@ -216,7 +215,8 @@ def showCategories():
     recent_list = session.query(Resource).order_by(Resource.date_time.desc()).limit(5)
     
     if 'user_id' in login_session:
-        print "user id %s", login_session['user_id']
+        credentials = login_session.get('credentials')
+        print "access %s", credentials.access_token
         return render_template("bookmark_categories.html", recent_list=recent_list, category_list=category_list, user_id=login_session['user_id'], login_session=login_session)
     else:
         print "no user id"

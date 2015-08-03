@@ -7,14 +7,18 @@
 
 
 	{% for r in resources_list %}
+		<!-- only show screenshot if we are able to take a valid screen shot-->
+		{% if r.screenshot != "/static/images/default.png" %}
+			<img src="{{r.screenshot}}" width="100px;" height="100px;"> 
+		{% endif %}
 		<a href="{{r.url}}" target="_blank">{{r.name}}</a> &nbsp; &nbsp;
 
-		<img src="{{r.screenshot}}" width="100px;" height="100px;"> <br/>
+		
 		{% if r.user_id == user_id %}
 
-		<a href="{{url_for('editResource', category_id=category_id, resource_id = r.id) }}"> Edit </a> &nbsp; &nbsp;
+		<a href="{{url_for('editResource', category_id=category_id, resource_id = r.id) }}" style="font-size:12px; color:#42C3C9;"> Edit </a> &nbsp; &nbsp;
 
-		<a href="{{url_for('deleteResource', category_id=category_id, resource_id = r.id) }}"> Delete </a>
+		<a href="{{url_for('deleteResource', category_id=category_id, resource_id = r.id) }}" style="font-size:12px; color:#42C3C9;"> Delete </a>
 		{% endif %}
 
 		<br>
@@ -22,13 +26,13 @@
 
 		{% if r.user_id == user_id %}
 
-		<a href="{{url_for('editNotes', category_id=category_id, resource_id = r.id) }}"> Edit </a> &nbsp; &nbsp;
+		<a href="{{url_for('editNotes', category_id=category_id, resource_id = r.id) }}" style="font-size:12px; color:#42C3C9;"> Edit </a> &nbsp; &nbsp;
 		{% endif %}
 
 		<hr>
 	{% endfor %}
 
-	{% endblock %}
-	</section>
+		</section>
+{% endblock %}
 
 

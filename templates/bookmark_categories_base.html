@@ -2,25 +2,35 @@
 {% extends "base.html" %}
 {% block content %}
 
-<!-- List of bookmark categories goes here-->
-<section class="col-md-5 category-area">
-	<h1>Your bookmark categories</h1>
-	<div  class="new-category" >
+<!-- CATEGORY AREA (display all categories in the left column-->
+<section class="col-md-3 category-area">
 
-		<a href="{{url_for('newCategory')}}">Add new Category</a>
+	
+	<div  class="category row" >
+		<div class="col-xs-8">
+			 <h2>Bookmark categories</h2>
+		</div>
+		<div class="col-xs-4 add-new">
+			<a href="{{url_for('newCategory')}}">Add new Category</a>
+		</div>
 	</div>
-	<div class="categories">
+
+	<div class="categories-list">
 
 	{% for c in category_list %}
-		<a href="{{url_for('showResources', category_id = c.id) }}" > {{ c.name}} </a> &nbsp; &nbsp;
-		{% if c.user_id == user_id %}
-		<a href="{{url_for('editCategory', category_id = c.id) }}"> Edit </a> &nbsp; &nbsp;
-		<a href="{{url_for('deleteCategory', category_id = c.id) }}"> Delete </a>
-		{% endif %}
-		<br>
-		{{c.description}}
 		
-		<hr>
+		<div class="category-list-item">
+			<a style="text-decoration: none;" href="{{url_for('showResources', category_id = c.id) }}" > {{ c.name}} </a> &nbsp; &nbsp;
+			{% if c.user_id == user_id %}
+				<a href="{{url_for('editCategory', category_id = c.id) }}" style="font-size:12px; color:#42C3C9;"> Edit </a> &nbsp; &nbsp;
+				<a href="{{url_for('deleteCategory', category_id = c.id) }}" style="font-size:12px; color:#42C3C9;"> Delete </a>
+			{% endif %}
+			<br>
+			<div id="category-description" >
+				<span style="color:#ababb5;">Description:</span> {{c.description}}
+			</div>
+		</div>
+		
 	{% endfor %}
 
 		</div>
@@ -29,8 +39,14 @@
 </section>
 
 <!-- Flash Messages go here -->
-<section class="col-md-7">
-	<div class="flass-message">
+<section class="col-md-6 resources">
+		{% block contentres %}
+		{% endblock %}
+	
+</section>
+
+<section class="col-md-3">
+	<div class="flash-message" style="text-align:right;">
 		<!--MESSAGE FLASHING EXAMPLE -->
 		{% with messages = get_flashed_messages() %}
 		{% if messages %}
@@ -44,12 +60,7 @@
 		{% endwith %}
 	</div>
 
-	<section class="resources">
-		{% block contentres %}
-		{% endblock %}
-	</section>
 </section>
-
 
 {% endblock %}
 

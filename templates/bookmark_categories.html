@@ -22,12 +22,12 @@
 		<div class="category-list-item">
 			<a style="text-decoration: none;" href="{{url_for('showResources', category_id = c.id) }}" > {{ c.name}} </a> &nbsp; &nbsp;
 			{% if c.user_id == user_id %}
-				<a href="{{url_for('editCategory', category_id = c.id) }}"> Edit </a> &nbsp; &nbsp;
-				<a href="{{url_for('deleteCategory', category_id = c.id) }}"> Delete </a>
+				<a href="{{url_for('editCategory', category_id = c.id) }}" style="font-size:12px; color:#42C3C9;"> Edit </a> &nbsp; &nbsp;
+				<a href="{{url_for('deleteCategory', category_id = c.id) }}" style="font-size:12px; color:#42C3C9;"> Delete </a>
 			{% endif %}
 			<br>
-			<div id="category-description">
-				{{c.description}}
+			<div id="category-description" >
+				<span style="color:#ababb5;">Description:</span> {{c.description}}
 			</div>
 		</div>
 		
@@ -39,8 +39,37 @@
 </section>
 
 <!-- Flash Message and latest -->
-<section class="col-md-9">
-	<div class="flass-message">
+<section class="col-md-6">
+
+
+	<section class="resources">
+	<h2> Latest Items</h2>
+		{% for r in recent_list %}
+		<a href="{{r.url}}" target="_blank">{{r.name}}</a> &nbsp; &nbsp;
+
+		<img src="{{r.screenshot}}" width="100px;" height="100px;"> <br/>
+		{% if r.user_id == user_id %}
+
+		<a href="{{url_for('editResource', category_id = r.category_id, resource_id = r.id) }}" style="font-size:12px; color:#42C3C9;"> Edit </a> &nbsp; &nbsp;
+
+		<a href="{{url_for('deleteResource', category_id = r.category_id, resource_id = r.id) }}" style="font-size:12px; color:#42C3C9;"> Delete </a>
+		{% endif %}
+
+		<br>
+		<b> Notes:&nbsp;&nbsp;</b>{{r.notes}} &nbsp;&nbsp;
+
+		{% if r.user_id == user_id %}
+
+		<a href="{{url_for('editNotes', category_id=r.category_id, resource_id = r.id) }}" style="font-size:12px; color:#42C3C9;"> Edit </a> &nbsp; &nbsp;
+		{% endif %}
+
+		<hr>
+	{% endfor %}
+	</section>
+</section>
+
+<section class="col-md-3">
+		<div class="flass-message">
 		<!--MESSAGE FLASHING EXAMPLE -->
 		{% with messages = get_flashed_messages() %}
 		{% if messages %}
@@ -53,31 +82,6 @@
 		{% endif %}
 		{% endwith %}
 	</div>
-
-	<section class="resources">
-	<h2> Latest Items</h2>
-		{% for r in recent_list %}
-		<a href="{{r.url}}" target="_blank">{{r.name}}</a> &nbsp; &nbsp;
-
-		<img src="{{r.screenshot}}" width="100px;" height="100px;"> <br/>
-		{% if r.user_id == user_id %}
-
-		<a href="{{url_for('editResource', category_id = r.category_id, resource_id = r.id) }}"> Edit </a> &nbsp; &nbsp;
-
-		<a href="{{url_for('deleteResource', category_id = r.category_id, resource_id = r.id) }}"> Delete </a>
-		{% endif %}
-
-		<br>
-		<b> Notes:&nbsp;&nbsp;</b>{{r.notes}} &nbsp;&nbsp;
-
-		{% if r.user_id == user_id %}
-
-		<a href="{{url_for('editNotes', category_id=r.category_id, resource_id = r.id) }}"> Edit </a> &nbsp; &nbsp;
-		{% endif %}
-
-		<hr>
-	{% endfor %}
-	</section>
 </section>
 
 
