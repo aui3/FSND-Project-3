@@ -1,48 +1,36 @@
-<!--<!DOCTYPE HTML>
-<html>
-	<head>
 
-	</head>
-<body>
-!-->
 {% extends "base.html" %}
 {% block content %}
 
-<!-- Login Log Out
-<div id="login"> <a href="{{url_for('showLogin')}}"> Login </a></div>
+<!-- CATEGORY AREA (display all categories in the left column-->
+<section class="col-md-3 category-area">
 
-<div id="logout" style="display:none;"> <a href="{{url_for('gdisconnect')}}"> Logout </a></div>
-
-{% if user_id %}
-<div class="userinfo"> 
-Hi, {{login_session['username']}}
-</div>
-<script type="text/javascript">
-	document.getElementById('login').style.display="none";
-	document.getElementById('logout').style.display="block";
-</script>
-
-{% endif %}
--->
-<!-- CATEGORY AREA-->
-<section class="col-md-5 category-area">
-	<h1>Your bookmark categories</h1>
-	<div  class="new-category" >
-
-		<a href="{{url_for('newCategory')}}">Add new Category</a>
+	
+	<div  class="category row" >
+		<div class="col-xs-8">
+			 <h2>Bookmark categories</h2>
+		</div>
+		<div class="col-xs-4 add-new">
+			<a href="{{url_for('newCategory')}}">Add new Category</a>
+		</div>
 	</div>
-	<div class="categories">
+
+	<div class="categories-list">
 
 	{% for c in category_list %}
-		<a href="{{url_for('showResources', category_id = c.id) }}" > {{ c.name}} </a> &nbsp; &nbsp;
-		{% if c.user_id == user_id %}
-		<a href="{{url_for('editCategory', category_id = c.id) }}"> Edit </a> &nbsp; &nbsp;
-		<a href="{{url_for('deleteCategory', category_id = c.id) }}"> Delete </a>
-		{% endif %}
-		<br>
-		{{c.description}}
 		
-		<hr>
+		<div class="category-list-item">
+			<a style="text-decoration: none;" href="{{url_for('showResources', category_id = c.id) }}" > {{ c.name}} </a> &nbsp; &nbsp;
+			{% if c.user_id == user_id %}
+				<a href="{{url_for('editCategory', category_id = c.id) }}"> Edit </a> &nbsp; &nbsp;
+				<a href="{{url_for('deleteCategory', category_id = c.id) }}"> Delete </a>
+			{% endif %}
+			<br>
+			<div id="category-description">
+				{{c.description}}
+			</div>
+		</div>
+		
 	{% endfor %}
 
 		</div>
@@ -51,7 +39,7 @@ Hi, {{login_session['username']}}
 </section>
 
 <!-- Flash Message and latest -->
-<section class="col-md-7">
+<section class="col-md-9">
 	<div class="flass-message">
 		<!--MESSAGE FLASHING EXAMPLE -->
 		{% with messages = get_flashed_messages() %}
@@ -94,15 +82,4 @@ Hi, {{login_session['username']}}
 
 
 {% endblock %}
-<!--<div>
-user id is: {{login_session}}
 
-
-</div> 
-!-->
-
-
-
-
-
-<!--</body>!-->

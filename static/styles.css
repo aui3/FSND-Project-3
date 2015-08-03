@@ -3,6 +3,52 @@
 	font-weight: 700;
 }
 
+
+
+.container-fluid {
+
+	padding: 2%;
+}
+
+#app-name {
+
+	font-size: 22px;
+	font-color: red;
+	text-decoration: none;
+
+}
+
+.header-row {
+	padding-top: 1%;
+	padding-bottom: 1%;
+	border: 1px solid;
+	text-align: left;
+}
+
+.add-new {
+
+	padding:2%; 
+	margin-top:20px; 
+	margin-bottom: 10px;
+}
+
+.category-list {
+
+	padding: 1%;
+}
+
+.category-list-item {
+
+	padding: 2%;
+}
+
+.cat-name {
+	font-weight: bold;
+	text-decoration: none;
+}
+
+
+
 h1 {
 	font-family: "Helvetica Neue Light", Roboto, Helvetica, Arial, sans-serif;
 	font-size: 50px;

@@ -15,16 +15,22 @@
 	<body>
 		<main class="container-fluid"> 
 			
-		<header class="row">
-			<!-- Login Log Out-->
-			<div class="col-md-9 app-name">
-					<a href="{{url_for('showCategories')}}">Bookmarks App</a>
+		<header class="row header-row">
+			
+			<!-- App name/logo to go here-->
+			<div class="col-md-9 ">
+					<a id= "app-name" href="{{url_for('showCategories')}}">Bookmarks App</a><br/>
+					Organize your bookmarks into categories
 			</div>
-			<div class="col-md-3">
-				
+			
+			<!-- Login Log Out-->
+			<div class="col-md-3" style="text-align:right;">
+
 				{% if 'username' in login_session %} 
 					
-					<h2>Hi, {{login_session['username']}}</h2>
+					Hi, {{login_session['username']}} <br/>
+
+					<img src="{{login_session['picture']}}" style="width:50px; height:50px;border-radius:5px;" >
 					<a href="{{url_for('gdisconnect')}}"> Logout </a>
 
 				{% else %}
@@ -32,6 +38,7 @@
 					<a href="{{url_for('showLogin')}}"> Login </a>
 				
 				{% endif %}
+
 			</div>
 		</header>
 

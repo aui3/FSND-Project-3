@@ -1,30 +1,8 @@
-<!--<!DOCTYPE HTML>
-<html>
-	<head>
 
-	</head>
-<body>
-!-->
 {% extends "base.html" %}
 {% block content %}
 
-<!-- Login Log Out
-<div id="login"> <a href="{{url_for('showLogin')}}"> Login </a></div>
-
-<div id="logout" style="display:none;"> <a href="{{url_for('gdisconnect')}}"> Logout </a></div>
-
-{% if user_id %}
-<div class="userinfo"> 
-Hi, {{login_session['username']}}
-</div>
-<script type="text/javascript">
-	document.getElementById('login').style.display="none";
-	document.getElementById('logout').style.display="block";
-</script>
-
-{% endif %}
--->
-<!-- CATEGORY AREA-->
+<!-- List of bookmark categories goes here-->
 <section class="col-md-5 category-area">
 	<h1>Your bookmark categories</h1>
 	<div  class="new-category" >
@@ -50,7 +28,7 @@ Hi, {{login_session['username']}}
 
 </section>
 
-<!-- Flash Message and latest -->
+<!-- Flash Messages go here -->
 <section class="col-md-7">
 	<div class="flass-message">
 		<!--MESSAGE FLASHING EXAMPLE -->
@@ -74,15 +52,4 @@ Hi, {{login_session['username']}}
 
 
 {% endblock %}
-<!--<div>
-user id is: {{login_session}}
 
-
-</div> 
-!-->
-
-
-
-
-
-<!--</body>!-->
