@@ -43,11 +43,20 @@
 
 
 	<section class="resources">
-	<h2> Latest Items</h2>
+	
+
+	<div  class="category row" >
+		<div class="col-xs-8">
+			 <h2>Latest Items</h2>
+		</div>
+		
+	</div>
+	
 		{% for r in recent_list %}
+		<img src="{{r.screenshot}}" width="100px;" height="100px;">
 		<a href="{{r.url}}" target="_blank">{{r.name}}</a> &nbsp; &nbsp;
 
-		<img src="{{r.screenshot}}" width="100px;" height="100px;"> <br/>
+		 
 		{% if r.user_id == user_id %}
 
 		<a href="{{url_for('editResource', category_id = r.category_id, resource_id = r.id) }}" style="font-size:12px; color:#42C3C9;"> Edit </a> &nbsp; &nbsp;
@@ -69,7 +78,7 @@
 </section>
 
 <section class="col-md-3">
-		<div class="flass-message">
+		<div class="flash-message">
 		<!--MESSAGE FLASHING EXAMPLE -->
 		{% with messages = get_flashed_messages() %}
 		{% if messages %}

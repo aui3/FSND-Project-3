@@ -49,6 +49,12 @@
 	font-weight: bold;
 	text-decoration: none;
 }
+.flash-message {
+
+	padding: 2%;
+	font-color: #e2790f;
+	margin-top: 20px;
+}
 
 
 

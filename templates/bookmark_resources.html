@@ -3,7 +3,16 @@
 
 	<section class="resources">
 
-	<h2><a href="{{url_for('newResource', category_id=category_id)}}">Add new Resource</a></strong></h2>
+		
+	<div  class="category row" >
+		<div class="col-xs-8">
+			 <h2>Your bookmarks for category {{category_listed.name}}</h2>
+		</div>
+		<div class="col-xs-4 add-new">
+			<a href="{{url_for('newResource', category_id=category_id)}}">Add new Resource</a>
+		</div>
+	</div>
+
 
 
 	{% for r in resources_list %}
