@@ -22,7 +22,6 @@ FSND- Project 3 Bookmarks Catalog App
 	d) <b>cd \bookmarks</b>
 
 
-
 3. Copy all source files from the project here. 
 
 
@@ -34,23 +33,20 @@ FSND- Project 3 Bookmarks Catalog App
 5. Populate the database with some entries:
 	g) <b>python lotsofbookmarks.py</b>
 
+<b>Requirements</b>
 
-6. Install <b>cloudinary</b> [Using Cloudinary's image services to take a screen shot of the bookmark site. The image url is saved in the database while the image itself is hosted with Coudinary]
-	h) <b>sudo pip install cloudinart</b>
-
-7. Install <b>beautifulsoup</b> [Using this python library to extract the title of a webpage that has to be added as a bookmark. The library parses through the html of a given webpage]
-	i) <b>sudo pip install beautifulsoup</b>
+	6. Install dependencies using instructions found in <b>requirements.txt</b>
 	
 
-8. Run the project
+7. Run the project
 	j) <b> python project.py</b>
 
 
-9. To view the project, open the broswer at 
+8. To view the project, open the broswer at 
 
 	g) <b>http://localhost:5000</b>
 
 
-10. Quit by pressing Ctrl + C 
+9. Quit by pressing Ctrl + C 
 
 

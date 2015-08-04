@@ -1,3 +1,4 @@
+# Run 'sudo pip install -r requirements.txt' to install these dependencies
 cloudinary==1.1.1
 vboxapi==1.0
 wsgiref==0.1.2
