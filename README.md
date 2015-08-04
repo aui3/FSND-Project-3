@@ -35,16 +35,17 @@ FSND- Project 3 Bookmarks Catalog App
 
 <b>Requirements</b>
 
-	6. Install dependencies using instructions found in <b>requirements.txt</b>
+	6. Install dependencies using instructions found in requirements.txt
 	
 
 7. Run the project
-	j) <b> python project.py</b>
+
+	i) <b> python project.py</b>
 
 
 8. To view the project, open the broswer at 
 
-	g) <b>http://localhost:5000</b>
+	j) <b>http://localhost:5000</b>
 
 
 9. Quit by pressing Ctrl + C 
