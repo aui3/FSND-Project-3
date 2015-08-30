@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 
 from database_setup import BookmarkCategory, Base, Resource, User
 
-engine = create_engine('sqlite:///bookmarks.db')
+engine = create_engine('postgres://ztmbqjryytprzu:KS8GVxNR6jWPQ4QxOrzwrD0BZq@ec2-54-197-238-19.compute-1.amazonaws.com:5432/d2jkttgdh3816k')
 # Bind the engine to the metadata of the Base class so that the
 # declaratives can be accessed through a DBSession instance
 Base.metadata.bind = engine

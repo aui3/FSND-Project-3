@@ -34,7 +34,7 @@ cloudinary.config(cloud_name="aui3", api_key="227915768443584",
 app = Flask(__name__)
 
 # Connect to Database and create database session
-engine = create_engine('sqlite:///bookmarks.db')
+engine = create_engine('postgres://ztmbqjryytprzu:KS8GVxNR6jWPQ4QxOrzwrD0BZq@ec2-54-197-238-19.compute-1.amazonaws.com:5432/d2jkttgdh3816k')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
@@ -211,6 +211,7 @@ def gdisconnect():
 @app.route('/')
 @app.route('/bookmark_categories/')
 def showCategories():
+
     category_list = session.query(BookmarkCategory)
     # list of recently added items
     recent_list = session.query(Resource).order_by(
@@ -332,6 +333,7 @@ def showResources(category_id):
     else:
         return render_template("bookmark_resources.html",
                                resources_list=resources_list,
+                               category_listed=category_listed,
                                category_id=category_id,
                                user_id="",
                                category_list=category_list)
@@ -543,11 +545,11 @@ def bookmarkJSON(category_id, resource_id):
     return jsonify(Bookmark=bookmark.serialize)
 
 
-if __name__ == '__main__':
+#if __name__ == '__main__':
 
-    try:
-        app.secret_key = 'super_secret_key'
-        app.debug = True
-        app.run(host='0.0.0.0', port=5000)
-    except KeyboardInterrupt:
-        print "^c Entered   "
+#   try:
+app.secret_key = 'super_secret_key'
+app.debug = True
+#        app.run(host='0.0.0.0', port=5000)
+#  except KeyboardInterrupt:
+#     print "^c Entered   "

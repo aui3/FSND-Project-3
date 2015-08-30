@@ -26,6 +26,7 @@ class BookmarkCategory(Base):
     description = Column(String(250), default=" Category Description")
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
+    resources = relationship("Resource", cascade="all, delete-orphan")
 
     @property
     def serialize(self):
@@ -66,7 +67,7 @@ class Resource(Base):
 
 
 
-engine = create_engine('sqlite:///bookmarks.db')
+engine = create_engine('postgres://ztmbqjryytprzu:KS8GVxNR6jWPQ4QxOrzwrD0BZq@ec2-54-197-238-19.compute-1.amazonaws.com:5432/d2jkttgdh3816k')
 
 
 Base.metadata.create_all(engine)

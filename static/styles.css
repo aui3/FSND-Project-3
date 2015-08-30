@@ -1,10 +1,7 @@
 * {
 	font-family: "Helvetica Neue Bold", Roboto, Helvetica, Arial, sans-serif;
-	font-weight: 700;
 	font-color: #303050;
 }
-
-
 
 .container-fluid {
 
@@ -14,7 +11,6 @@
 #app-name {
 
 	font-size: 22px;
-	font-color: red;
 	text-decoration: none;
 
 }
@@ -28,8 +24,8 @@
 
 .add-new {
 
-	padding:2%; 
-	margin-top:20px; 
+	padding:2%;
+	margin-top:20px;
 	margin-bottom: 10px;
 }
 
