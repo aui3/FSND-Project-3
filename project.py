@@ -544,11 +544,6 @@ def bookmarkJSON(category_id, resource_id):
     bookmark = session.query(Resource).filter_by(id=resource_id).one()
     return jsonify(Bookmark=bookmark.serialize)
 
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static', 'images'),
-                               'favicon.ico', mimetype='image/png')
-
 #if __name__ == '__main__':
 
 #   try:
